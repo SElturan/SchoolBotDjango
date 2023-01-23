@@ -14,7 +14,7 @@ class TelegramUser(models.Model):
     first_name = models.CharField(max_length=255, null=True, blank=True)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     is_bot = models.BooleanField(default=False)
-    phone_number = models.CharField(max_length=255, null=True, blank=True)
+    phone_number = models.CharField(max_length=255, null=True, blank=True, unique=True)
     bun = models.BooleanField(default=False)
     role = models.CharField(max_length=255, choices=ROLE_CHOICES, default='user')
     description = models.CharField(max_length=300, null=True, blank=True)
@@ -68,16 +68,12 @@ class Order(models.Model):
         ('canceled', 'Отменен'),
         ('in_progress', 'В процессе'),
     )
-    PAYMENT_CHOICES = (
-        ('paid', 'Оплачен'),
-        ('not_paid', 'Не оплачен'),
-    )
+
     user = models.ForeignKey(TelegramUser, on_delete=models.CASCADE, related_name='orders')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='orders')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=255, choices=STATUS_CHOICES, default='new')
-    payment = models.CharField(max_length=255, choices=PAYMENT_CHOICES, default='not_paid')
     photo = models.CharField(max_length=700,null=True, blank=True)
     order = models.TextField(null=True, blank=True)
     date_to_complete = models.CharField(max_length=255, null=True, blank=True)
@@ -129,18 +125,10 @@ class Student(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     phone_number = models.CharField(max_length=255, null=True, blank=True, unique=True)
+    pay_number = models.CharField(max_length=300, unique=True )
     description = models.CharField(max_length=300, null=True, blank=True)
     stud_comment = models.CharField(max_length=300, null=True, blank=True ) #прописывается арбитражником, для указания причины полного бана, либо просто комментарий к пользователю
-    stud_tasks_add = models.IntegerField(null=True, blank=True) #счетчик количества добавленных в систему заданий
-    stud_tasks_paid = models.IntegerField(null=True, blank=True) #счетчик оплаченных заданий
-    stud_tasks_pass = models.IntegerField(null=True, blank=True) #счетчик оплаченных заданий, которые учитель в итоге не смог решить и нажал кнопку - не могу решить
-    stud_tasks_solved = models.IntegerField(null=True, blank=True) #счетчик оплаченных заданий, которые учитель решил и скинул решение
-    stud_tasks_not_paid = models.IntegerField(null=True, blank=True) #счетчик не оплаченных заданий ( учитель согласился решать, а оплата не прошла)
     stud_tasks_ban = models.IntegerField(null=True, blank=True) #добавлена запрещенная картинка или текст
-    stud_tasks_arbitration = models.IntegerField(null=True, blank=True) #задание некоректно, не хватает данных, или ошибочно выбран предмет или класс
-    stud_tasks_arbitration_incorrect = models.IntegerField(null=True, blank=True) #при нажатии на кнопку - решение с ошибкой прибавляем + 1 к счетчику
-    tasks_arbitration_correctstud = models.IntegerField(null=True, blank=True) #при отказе в арбитраже ( решение правильное)  прибавляем + 1 к счетчику
-    stud_amount = models.IntegerField(null=True, blank=True) #сумма оплаченных решений. прибавляем когда учитель нажал на кнопку "оплата получена"
     stud_level = models.IntegerField(default = 1) 
     stud_calc_value = models.IntegerField(null=True, blank=True)
 
@@ -163,21 +151,10 @@ class Teacher(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     phone_number = models.CharField(max_length=255, null=True, blank=True, unique=True)
+    pay_number = models.CharField(max_length=300, unique=True )
     description = models.CharField(max_length=300, null=True, blank=True) 
     teacher_comment = models.CharField(max_length=300, null=True, blank=True ) #прописывается арбитражником, для указания причины полного бана, либо просто комментарий к учителю
     teacher_tasks_ban = models.BooleanField(default=False) #добавлена запрещенная картинка или текст. учитель отметил задание как бан
-    teach_tasks_paid = models.IntegerField(null=True, blank=True) #счетчик оплаченных заданий( учитель согласился решать, и пришла оплата)
-    teach_tasks_not_paid = models.IntegerField(null=True, blank=True) #счетчик не оплаченных заданий ( учитель согласился решать, а оплата не прошла)
-    teach_tasks_solved = models.IntegerField(null=True, blank=True) #счетчик решенных заданий ( учитель согласился решать, пришла оплата, учитель добавил в бота решение)
-    teach_tasks_pass = models.IntegerField(null=True, blank=True) #счетчик решенных заданий ( учитель согласился решать, пришла оплата, учитель нажал кнопку "не могу решить" )
-    teach_tasks_not_solved_in_time = models.IntegerField(null=True, blank=True) #счетчик решенных заданий ( учитель согласился решать, пришла оплата, но учитель добавил решение после окончания допустимого времени )
-    teach_tasks_arbitration = models.IntegerField(null=True, blank=True)  #при нажатии на кнопку - решение с ошибкой прибавляем + 1 к счетчику
-    teach_tasks_arbitration_incorrect = models.IntegerField(null=True, blank=True) #при отказе в арбитраже ( решение правильное)  прибавляем + 1 к счетчику
-    tasks_arbitration_correctteach = models.IntegerField(null=True, blank=True) #при подтверждении в арбитраже ( решение не правильное)  прибавляем + 1 к счетчику
-    teach_amount = models.IntegerField(null=True, blank=True) #сумма оплаченных решений. прибавляем когда учитель нажал на кнопку "оплата получена"
-    teach_fee = models.IntegerField(null=True, blank=True) #прибавляем штраф в случае нерешенного, просроченного или решения с ошибкой(подтвержденное арбитражником)
-    teach_comission = models.IntegerField(null=True, blank=True)  #прибавляем task_comission
-    teach_total_sum_to_pay = models.IntegerField(null=True, blank=True) #teach_fee + teach_total_sum_to_pay
     teach_paid = models.IntegerField(null=True, blank=True) #сумма оплаченных комиссий и штрафов
     teach_level = models.IntegerField(default = 1)
     teach_calc_value = models.IntegerField(null=True, blank=True)

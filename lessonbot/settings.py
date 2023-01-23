@@ -105,7 +105,7 @@ WSGI_APPLICATION = 'lessonbot.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'lessonbotdb',
+        'NAME': 'reshiteldb',
         'USER': 'postgres',
         'PASSWORD': '123',
         'HOST':'127.0.0.1',

@@ -1,4 +1,4 @@
-#!/home/elturan/Рабочий стол/Desktop/mywork/reshitel_bot/venv/bin/python3
+#!/home/elturan/Рабочий стол/lessonbot.2.0/venv/bin/python3
 # When the django-admin.py deprecation ends, remove this script.
 import warnings
 

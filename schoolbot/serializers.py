@@ -41,11 +41,9 @@ class OrderListSerializer(serializers.ModelSerializer):
     order_process = OrderProcessForOrderList(many=True, read_only=True)
 
 
-    
-
     class Meta:
         model = Order
-        fields = ('id', 'user', 'subject', 'status', 'payment', 'photo', 'order', 'date_to_complete', 'price', 'order_process', )
+        fields = ('id', 'user', 'subject', 'status','photo', 'order', 'date_to_complete', 'price', 'order_process', )
 
 
 
@@ -54,7 +52,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     subject = SubjectSerializer()
     class Meta:
         model = Order
-        fields = ('id', 'user' ,'subject', 'status', 'payment', 'photo', 'order', 'date_to_complete', 'price', )
+        fields = ('id', 'user' ,'subject', 'status', 'photo', 'order', 'date_to_complete', 'price', )
 
 
 class OrderSerializer(serializers.Serializer):
